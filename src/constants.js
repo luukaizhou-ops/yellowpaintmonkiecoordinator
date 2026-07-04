@@ -10,6 +10,7 @@ export const FRIENDS = [
   'Alina',
   'Sherry',
   'Luukai',
+  'Ethan',
 ]
 
 export const TOTAL_FRIENDS = FRIENDS.length
