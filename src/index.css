@@ -441,6 +441,12 @@ body {
   color: var(--text-muted);
   font-weight: 500;
 }
+.modal-message {
+  margin: 0 0 4px;
+  font-size: 15px;
+  color: var(--ink);
+  line-height: 1.5;
+}
 .modal-label {
   display: block;
   font-size: 13px;
@@ -491,6 +497,13 @@ body {
 }
 .modal-confirm:active {
   background: var(--accent);
+}
+.modal-danger {
+  background: #e35d4f;
+  color: #fff;
+}
+.modal-danger:active {
+  background: #c4453a;
 }
 
 /* ---------- Footer ---------- */

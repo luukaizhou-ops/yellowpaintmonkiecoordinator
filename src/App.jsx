@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
 import { NAME_STORAGE_KEY } from './constants'
 import { useSchedule } from './useSchedule'
+import { formatShort } from './dateUtils'
 import NamePicker from './components/NamePicker'
 import HangoutBanner from './components/HangoutBanner'
 import BestDates from './components/BestDates'
 import DateGrid from './components/DateGrid'
 import LockInModal from './components/LockInModal'
+import ConfirmDialog from './components/ConfirmDialog'
 
 export default function App() {
   // Remember who you are on this device.
@@ -29,6 +31,8 @@ export default function App() {
 
   // Which date/slot the "lock in" modal is open for (null = closed).
   const [lockTarget, setLockTarget] = useState(null)
+  // Whether the "clear hangout" confirmation is showing.
+  const [confirmingClear, setConfirmingClear] = useState(false)
 
   // Missing keys? Point the user at the setup instructions instead of a
   // blank, confusing screen.
@@ -78,7 +82,10 @@ export default function App() {
 
   return (
     <div className="app">
-      <HangoutBanner hangout={schedule.hangout} onClear={schedule.clearHangout} />
+      <HangoutBanner
+        hangout={schedule.hangout}
+        onClear={() => setConfirmingClear(true)}
+      />
 
       <header className="app-header">
         <div>
@@ -123,6 +130,25 @@ export default function App() {
         defaultTitle={schedule.hangout?.title || 'Pie baking'}
         onConfirm={confirmLock}
         onCancel={() => setLockTarget(null)}
+      />
+
+      <ConfirmDialog
+        open={confirmingClear}
+        title="Clear the hangout?"
+        message={
+          schedule.hangout
+            ? `This removes “${schedule.hangout.title}” on ${formatShort(
+                schedule.hangout.date
+              )} (${schedule.hangout.slot}) for everyone.`
+            : ''
+        }
+        confirmLabel="Clear it"
+        cancelLabel="Keep it"
+        onConfirm={() => {
+          schedule.clearHangout()
+          setConfirmingClear(false)
+        }}
+        onCancel={() => setConfirmingClear(false)}
       />
     </div>
   )
