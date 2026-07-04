@@ -7,18 +7,18 @@ import {
   buildUpcomingDates,
 } from '../dateUtils'
 
-// Turn a "how many people are free" ratio into a warm heat color.
-// Empty = cool neutral; nearly-everyone = deep warm orange.
+// Turn a "how many people are free" ratio into a heat color.
+// Empty = neutral; a few = pale yellow; nearly-everyone = warm orange.
 function heatStyle(count, total) {
   if (count === 0) {
     return { background: 'var(--cell-empty)', color: 'var(--text-muted)' }
   }
   const ratio = Math.min(count / total, 1)
-  // Amber (few) -> deep orange-red (many).
-  const hue = 45 - ratio * 33 // 45 -> 12
-  const light = 84 - ratio * 40 // 84% -> 44%
-  const sat = 85
-  const textColor = ratio > 0.5 ? '#fff' : '#5b3a1a'
+  // Pale yellow (few) -> saturated orange (many).
+  const hue = 52 - ratio * 20 // 52 -> 32
+  const light = 88 - ratio * 36 // 88% -> 52%
+  const sat = 92
+  const textColor = ratio > 0.62 ? '#fff' : '#5b4a10'
   return {
     background: `hsl(${hue} ${sat}% ${light}%)`,
     color: textColor,

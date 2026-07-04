@@ -4,8 +4,7 @@ import { FRIENDS } from '../constants'
 export default function NamePicker({ onPick }) {
   return (
     <div className="name-picker">
-      {/* Temporary placeholder — swap for the group's logo image. */}
-      <div className="app-logo">🐵</div>
+      <img className="app-logo" src="/logo.png" alt="monkies-coordinator logo" />
       <h1>monkies-coordinator</h1>
       <p className="subtitle">Who are you?</p>
       <div className="name-grid">

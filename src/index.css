@@ -1,13 +1,18 @@
 :root {
-  --bg: #fbf6ef;
+  /* Yellow-and-white palette, drawn from the group logo:
+     golden-yellow head, white shirt, orange feet as the accent. */
+  --bg: #fffdf5; /* soft warm white */
   --card: #ffffff;
-  --ink: #3a2a18;
-  --text-muted: #8b7a67;
-  --crust: #b5651d;
-  --crust-deep: #8f4e12;
-  --cell-empty: #f0e9df;
-  --border: #ece2d5;
-  --shadow: 0 1px 3px rgba(90, 60, 20, 0.08);
+  --ink: #34322a; /* dark warm gray for text */
+  --text-muted: #8f8974;
+  --yellow: #f7b500; /* primary golden yellow */
+  --yellow-bright: #ffcf1f; /* lighter yellow for gradients/fills */
+  --yellow-soft: #fff4bf; /* pale yellow highlight */
+  --gold-ink: #9a6b00; /* readable gold for headings/emphasis */
+  --accent: #f18a00; /* orange (from the feet) for the "hottest" dates */
+  --cell-empty: #f4f0e2; /* neutral empty cell */
+  --border: #efe6c9; /* soft yellow-tinted border */
+  --shadow: 0 1px 3px rgba(150, 120, 0, 0.1);
   --radius: 14px;
 }
 
@@ -46,7 +51,7 @@ body {
   box-shadow: var(--shadow);
 }
 .config-warning code {
-  background: #f3ece2;
+  background: #fbf3d6;
   padding: 2px 6px;
   border-radius: 6px;
   font-size: 0.9em;
@@ -58,13 +63,16 @@ body {
   padding-top: 40px;
 }
 .app-logo {
-  font-size: 64px;
-  line-height: 1;
+  display: block;
+  margin: 0 auto 6px;
+  height: 150px;
+  width: auto;
+  object-fit: contain;
 }
 .name-picker h1 {
   margin: 8px 0 2px;
   font-size: 32px;
-  color: var(--crust-deep);
+  color: var(--gold-ink);
 }
 .subtitle {
   margin: 0 0 24px;
@@ -90,7 +98,7 @@ body {
 }
 .name-button:active {
   transform: scale(0.97);
-  border-color: var(--crust);
+  border-color: var(--yellow);
 }
 .hint {
   margin-top: 24px;
@@ -112,8 +120,8 @@ body {
   box-shadow: var(--shadow);
 }
 .banner-set {
-  background: linear-gradient(135deg, var(--crust), var(--crust-deep));
-  color: #fff;
+  background: linear-gradient(135deg, var(--yellow-bright), var(--yellow));
+  color: var(--ink);
 }
 .banner-main {
   display: flex;
@@ -124,7 +132,7 @@ body {
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  opacity: 0.85;
+  opacity: 0.7;
 }
 .banner-title {
   font-size: 20px;
@@ -132,12 +140,12 @@ body {
 }
 .banner-when {
   font-size: 15px;
-  opacity: 0.95;
+  opacity: 0.85;
   text-transform: capitalize;
 }
 .banner-clear {
-  background: rgba(255, 255, 255, 0.2);
-  color: #fff;
+  background: rgba(0, 0, 0, 0.12);
+  color: var(--ink);
   border: none;
   width: 30px;
   height: 30px;
@@ -162,7 +170,7 @@ body {
 .switch-name {
   background: none;
   border: none;
-  color: var(--crust);
+  color: var(--gold-ink);
   font-size: 13px;
   text-decoration: underline;
   cursor: pointer;
@@ -205,7 +213,7 @@ body {
 .best-dates h2 {
   margin: 0 0 10px;
   font-size: 16px;
-  color: var(--crust-deep);
+  color: var(--gold-ink);
 }
 .best-dates .empty {
   margin: 0;
@@ -237,13 +245,14 @@ body {
   flex-shrink: 0;
 }
 .medal-1 {
-  background: #e0a325;
+  background: var(--yellow);
+  color: var(--ink);
 }
 .medal-2 {
-  background: #b6b6b6;
+  background: #cbcbcb;
 }
 .medal-3 {
-  background: #c98b4a;
+  background: var(--accent);
 }
 .best-when {
   flex: 1;
@@ -258,12 +267,12 @@ body {
 }
 .best-count {
   font-weight: 700;
-  color: var(--crust-deep);
+  color: var(--gold-ink);
 }
 .best-lock {
   flex-shrink: 0;
-  background: var(--crust);
-  color: #fff;
+  background: var(--yellow);
+  color: var(--ink);
   border: none;
   border-radius: 8px;
   padding: 6px 12px;
@@ -275,7 +284,7 @@ body {
 }
 .best-lock:active {
   transform: scale(0.95);
-  background: var(--crust-deep);
+  background: var(--accent);
 }
 
 /* ---------- Date grid ---------- */
@@ -288,14 +297,14 @@ body {
   margin: 0 0 4px;
 }
 .slot-legend {
-  background: #fff4e6;
-  border: 1px solid #f3ddc0;
+  background: var(--yellow-soft);
+  border: 1px solid #f2e08a;
   border-radius: 8px;
   padding: 6px 10px;
   display: inline-block;
 }
 .slot-legend strong {
-  color: var(--crust-deep);
+  color: var(--gold-ink);
 }
 .date-grid {
   display: flex;
@@ -320,8 +329,8 @@ body {
   padding: 6px 0;
 }
 .date-row.weekend .date-label {
-  background: #fff4e6;
-  border-color: #f3ddc0;
+  background: var(--yellow-soft);
+  border-color: #f2e3a8;
 }
 .dow {
   font-size: 11px;
@@ -362,8 +371,8 @@ body {
   transform: scale(0.97);
 }
 .slot-cell.mine {
-  border-color: var(--crust-deep);
-  box-shadow: 0 0 0 2px rgba(143, 78, 18, 0.25);
+  border-color: var(--gold-ink);
+  box-shadow: 0 0 0 2px rgba(154, 107, 0, 0.3);
 }
 .slot-name {
   font-size: 12px;
