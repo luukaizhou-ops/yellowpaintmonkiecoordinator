@@ -1,14 +1,15 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { supabase, hasSupabaseConfig } from './supabaseClient'
 import { TOTAL_FRIENDS } from './constants'
+import { todayISO } from './dateUtils'
 
 const key = (date, slot) => `${date}|${slot}`
 
-// One hook that owns all shared state: everyone's availability, the pinned
-// hangout, loading/error status, live updates, and the mutation helpers.
+// One hook that owns all shared state: everyone's availability, the list of
+// planned hangouts, loading/error status, live updates, and the mutations.
 export function useSchedule(myName) {
   const [availability, setAvailability] = useState([])
-  const [hangout, setHangout] = useState(null)
+  const [hangoutRows, setHangoutRows] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
@@ -22,16 +23,12 @@ export function useSchedule(myName) {
     try {
       const [availRes, hangoutRes] = await Promise.all([
         supabase.from('availability').select('id, name, date, slot'),
-        supabase
-          .from('hangout')
-          .select('id, date, slot, title')
-          .order('id', { ascending: false })
-          .limit(1),
+        supabase.from('hangout').select('id, date, slot, title'),
       ])
       if (availRes.error) throw availRes.error
       if (hangoutRes.error) throw hangoutRes.error
       setAvailability(availRes.data ?? [])
-      setHangout(hangoutRes.data?.[0] ?? null)
+      setHangoutRows(hangoutRes.data ?? [])
       setError(null)
     } catch (err) {
       // eslint-disable-next-line no-console
@@ -91,6 +88,17 @@ export function useSchedule(myName) {
 
   const countFor = useCallback((date, slot) => counts.get(key(date, slot)) ?? 0, [counts])
   const isMineFree = useCallback((date, slot) => mine.has(key(date, slot)), [mine])
+
+  // Upcoming hangouts only (past ones drop off automatically), soonest first.
+  const hangouts = useMemo(() => {
+    const today = todayISO()
+    return hangoutRows
+      .filter((h) => h.date >= today)
+      .sort((a, b) => {
+        if (a.date !== b.date) return a.date < b.date ? -1 : 1
+        return a.slot < b.slot ? -1 : 1
+      })
+  }, [hangoutRows])
 
   // Top 3 date/slot combos by number of people free.
   const bestSlots = useMemo(() => {
@@ -155,48 +163,71 @@ export function useSchedule(myName) {
     [myName, mine, loadAll]
   )
 
-  // Lock in the chosen hangout. Only ever one active row, so we clear the
-  // table first, then insert the new pick.
-  const setChosenHangout = useCallback(async (date, slot, title) => {
+  // Add a hangout to the list. To avoid duplicates, any existing hangout on
+  // the same date+slot is replaced (which also lets you rename one).
+  const addHangout = useCallback(async (date, slot, title) => {
     if (!supabase) return
-    const { error: delErr } = await supabase
-      .from('hangout')
-      .delete()
-      .neq('id', -1) // matches every row
-    if (delErr) {
-      console.error('clear hangout failed', delErr)
-      return
-    }
+    await supabase.from('hangout').delete().match({ date, slot })
     const { data, error: insErr } = await supabase
       .from('hangout')
       .insert({ date, slot, title: title || 'Pie baking' })
       .select()
       .single()
     if (insErr) {
-      console.error('set hangout failed', insErr)
+      console.error('add hangout failed', insErr)
       return
     }
-    setHangout(data)
+    setHangoutRows((prev) => [
+      ...prev.filter((h) => !(h.date === date && h.slot === slot)),
+      data,
+    ])
   }, [])
 
-  const clearHangout = useCallback(async () => {
+  // Remove a single hangout by id.
+  const removeHangout = useCallback(
+    async (id) => {
+      if (!supabase) return
+      setHangoutRows((prev) => prev.filter((h) => h.id !== id))
+      const { error: delErr } = await supabase
+        .from('hangout')
+        .delete()
+        .eq('id', id)
+      if (delErr) {
+        console.error('remove hangout failed', delErr)
+        loadAll()
+      }
+    },
+    [loadAll]
+  )
+
+  // Wipe everyone's availability to start a fresh planning round. Locked-in
+  // hangouts are untouched.
+  const clearAllAvailability = useCallback(async () => {
     if (!supabase) return
-    await supabase.from('hangout').delete().neq('id', -1)
-    setHangout(null)
-  }, [])
+    setAvailability([])
+    const { error: delErr } = await supabase
+      .from('availability')
+      .delete()
+      .neq('id', -1) // matches every row
+    if (delErr) {
+      console.error('clear availability failed', delErr)
+      loadAll()
+    }
+  }, [loadAll])
 
   return {
     loading,
     error,
     hasSupabaseConfig,
     totalFriends: TOTAL_FRIENDS,
-    hangout,
+    hangouts,
     countFor,
     isMineFree,
     bestSlots,
     toggleSlot,
-    setChosenHangout,
-    clearHangout,
+    addHangout,
+    removeHangout,
+    clearAllAvailability,
     reload: loadAll,
   }
 }

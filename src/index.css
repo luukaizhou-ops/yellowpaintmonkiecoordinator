@@ -107,11 +107,16 @@ body {
 }
 
 /* ---------- Hangout banner (sticky) ---------- */
-.banner {
+.banner-stack {
   position: sticky;
   top: 0;
   z-index: 10;
   margin: 0 -14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.banner {
   padding: 14px 18px;
   display: flex;
   align-items: center;
@@ -285,6 +290,42 @@ body {
 .best-lock:active {
   transform: scale(0.95);
   background: var(--accent);
+}
+
+/* ---------- New-round reset bar ---------- */
+.round-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow);
+}
+.round-bar span {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.round-reset {
+  background: none;
+  border: 1.5px solid var(--border);
+  color: var(--gold-ink);
+  font-size: 13px;
+  font-weight: 700;
+  font-family: inherit;
+  border-radius: 999px;
+  padding: 7px 14px;
+  cursor: pointer;
+  transition: transform 0.05s ease, border-color 0.15s ease;
+}
+.round-reset:active {
+  transform: scale(0.96);
+  border-color: var(--yellow);
 }
 
 /* ---------- Date grid ---------- */

@@ -23,6 +23,13 @@ export function buildUpcomingDates() {
   return dates
 }
 
+// Today as a "YYYY-MM-DD" string, for comparing against stored dates.
+export function todayISO() {
+  const d = new Date()
+  d.setHours(0, 0, 0, 0)
+  return toISODate(d)
+}
+
 // Parse a "YYYY-MM-DD" string into a local Date (no timezone surprises).
 export function parseISODate(iso) {
   const [y, m, d] = iso.split('-').map(Number)

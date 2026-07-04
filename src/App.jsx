@@ -31,8 +31,10 @@ export default function App() {
 
   // Which date/slot the "lock in" modal is open for (null = closed).
   const [lockTarget, setLockTarget] = useState(null)
-  // Whether the "clear hangout" confirmation is showing.
-  const [confirmingClear, setConfirmingClear] = useState(false)
+  // Which hangout the "clear this hangout" confirmation is for (null = closed).
+  const [clearTarget, setClearTarget] = useState(null)
+  // Whether the "clear everyone's dates" reset confirmation is showing.
+  const [confirmingReset, setConfirmingReset] = useState(false)
 
   // Missing keys? Point the user at the setup instructions instead of a
   // blank, confusing screen.
@@ -75,17 +77,14 @@ export default function App() {
 
   const confirmLock = (title) => {
     if (lockTarget) {
-      schedule.setChosenHangout(lockTarget.date, lockTarget.slot, title)
+      schedule.addHangout(lockTarget.date, lockTarget.slot, title)
     }
     setLockTarget(null)
   }
 
   return (
     <div className="app">
-      <HangoutBanner
-        hangout={schedule.hangout}
-        onClear={() => setConfirmingClear(true)}
-      />
+      <HangoutBanner hangouts={schedule.hangouts} onClear={setClearTarget} />
 
       <header className="app-header">
         <div>
@@ -112,6 +111,15 @@ export default function App() {
             totalFriends={schedule.totalFriends}
             onLock={handleLock}
           />
+          <div className="round-bar">
+            <span>Planning a fresh hangout?</span>
+            <button
+              className="round-reset"
+              onClick={() => setConfirmingReset(true)}
+            >
+              Clear everyone’s dates
+            </button>
+          </div>
           <DateGrid
             countFor={schedule.countFor}
             isMineFree={schedule.isMineFree}
@@ -127,28 +135,41 @@ export default function App() {
 
       <LockInModal
         target={lockTarget}
-        defaultTitle={schedule.hangout?.title || 'Pie baking'}
+        defaultTitle={schedule.hangouts[0]?.title || 'Pie baking'}
         onConfirm={confirmLock}
         onCancel={() => setLockTarget(null)}
       />
 
       <ConfirmDialog
-        open={confirmingClear}
-        title="Clear the hangout?"
+        open={!!clearTarget}
+        title="Clear this hangout?"
         message={
-          schedule.hangout
-            ? `This removes “${schedule.hangout.title}” on ${formatShort(
-                schedule.hangout.date
-              )} (${schedule.hangout.slot}) for everyone.`
+          clearTarget
+            ? `This removes “${clearTarget.title}” on ${formatShort(
+                clearTarget.date
+              )} (${clearTarget.slot}) for everyone.`
             : ''
         }
         confirmLabel="Clear it"
         cancelLabel="Keep it"
         onConfirm={() => {
-          schedule.clearHangout()
-          setConfirmingClear(false)
+          schedule.removeHangout(clearTarget.id)
+          setClearTarget(null)
         }}
-        onCancel={() => setConfirmingClear(false)}
+        onCancel={() => setClearTarget(null)}
+      />
+
+      <ConfirmDialog
+        open={confirmingReset}
+        title="Clear everyone’s dates?"
+        message="This wipes all availability marks so you can plan a fresh hangout from scratch. Locked-in hangouts stay. This affects everyone and can’t be undone."
+        confirmLabel="Clear all dates"
+        cancelLabel="Cancel"
+        onConfirm={() => {
+          schedule.clearAllAvailability()
+          setConfirmingReset(false)
+        }}
+        onCancel={() => setConfirmingReset(false)}
       />
     </div>
   )
