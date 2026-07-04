@@ -4,8 +4,9 @@ import { FRIENDS } from '../constants'
 export default function NamePicker({ onPick }) {
   return (
     <div className="name-picker">
-      <div className="pie-hero">🥧</div>
-      <h1>Pie Hangout</h1>
+      {/* Temporary placeholder — swap for the group's logo image. */}
+      <div className="app-logo">🐵</div>
+      <h1>monkies-coordinator</h1>
       <p className="subtitle">Who are you?</p>
       <div className="name-grid">
         {FRIENDS.map((name) => (

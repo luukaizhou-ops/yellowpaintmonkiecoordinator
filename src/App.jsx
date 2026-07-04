@@ -33,7 +33,7 @@ export default function App() {
     return (
       <div className="app">
         <div className="config-warning">
-          <h1>🥧 Almost there</h1>
+          <h1>Almost there</h1>
           <p>
             Your Supabase keys aren’t set yet. Copy <code>.env.example</code> to{' '}
             <code>.env</code>, fill in <code>VITE_SUPABASE_URL</code> and{' '}
@@ -100,19 +100,19 @@ export default function App() {
           <BestDates
             bestSlots={schedule.bestSlots}
             totalFriends={schedule.totalFriends}
+            onLock={handleLock}
           />
           <DateGrid
             countFor={schedule.countFor}
             isMineFree={schedule.isMineFree}
             onToggle={schedule.toggleSlot}
-            onLock={handleLock}
             total={schedule.totalFriends}
           />
         </>
       )}
 
       <footer className="app-footer">
-        <p>Marked free on {schedule.totalFriends} friends’ phones · live-synced 🥧</p>
+        <p>Shared across {schedule.totalFriends} friends’ phones · live-synced</p>
       </footer>
     </div>
   )

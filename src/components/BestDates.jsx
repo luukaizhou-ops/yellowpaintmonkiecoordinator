@@ -1,7 +1,8 @@
 import { formatShort } from '../dateUtils'
 
 // The top 3 date/slot combos, so the winner is obvious at a glance.
-export default function BestDates({ bestSlots, totalFriends }) {
+// Each one has a "Lock in" button to make it the group's chosen hangout.
+export default function BestDates({ bestSlots, totalFriends, onLock }) {
   const withPeople = bestSlots.filter((b) => b.count > 0)
 
   if (withPeople.length === 0) {
@@ -28,6 +29,13 @@ export default function BestDates({ bestSlots, totalFriends }) {
             <span className="best-count">
               {b.count}/{totalFriends}
             </span>
+            <button
+              className="best-lock"
+              onClick={() => onLock(b.date, b.slot)}
+              title="Make this the hangout"
+            >
+              Lock in
+            </button>
           </li>
         ))}
       </ol>

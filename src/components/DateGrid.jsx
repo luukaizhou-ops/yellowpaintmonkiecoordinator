@@ -8,7 +8,7 @@ import {
 } from '../dateUtils'
 
 // Turn a "how many people are free" ratio into a warm heat color.
-// Empty = cool neutral; nearly-everyone = deep pie-crust orange.
+// Empty = cool neutral; nearly-everyone = deep warm orange.
 function heatStyle(count, total) {
   if (count === 0) {
     return { background: 'var(--cell-empty)', color: 'var(--text-muted)' }
@@ -25,7 +25,7 @@ function heatStyle(count, total) {
   }
 }
 
-function SlotCell({ date, slot, count, total, mineFree, onToggle, onLock }) {
+function SlotCell({ date, slot, count, total, mineFree, onToggle }) {
   const style = heatStyle(count, total)
   return (
     <button
@@ -39,36 +39,22 @@ function SlotCell({ date, slot, count, total, mineFree, onToggle, onLock }) {
         {count}/{total}
       </span>
       {mineFree && <span className="slot-check">✓ you</span>}
-      <span
-        className="slot-lock"
-        role="button"
-        tabIndex={0}
-        title="Lock this in as the hangout"
-        onClick={(e) => {
-          e.stopPropagation()
-          onLock(date, slot)
-        }}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.stopPropagation()
-            onLock(date, slot)
-          }
-        }}
-      >
-        📌
-      </span>
     </button>
   )
 }
 
-export default function DateGrid({ countFor, isMineFree, onToggle, onLock, total }) {
+export default function DateGrid({ countFor, isMineFree, onToggle, total }) {
   const dates = buildUpcomingDates()
 
   return (
     <div className="date-grid">
-      <p className="grid-help">
-        Tap a slot to mark yourself free. Tap 📌 to lock in the hangout.
-      </p>
+      <div className="grid-help">
+        <p>Tap a slot to mark yourself free. Tap again to unmark.</p>
+        <p className="slot-legend">
+          <strong>Afternoon</strong> = before 4pm ·{' '}
+          <strong>Evening</strong> = 4pm onward
+        </p>
+      </div>
       {dates.map((date) => (
         <div
           key={date}
@@ -89,7 +75,6 @@ export default function DateGrid({ countFor, isMineFree, onToggle, onLock, total
                 count={countFor(date, slot)}
                 mineFree={isMineFree(date, slot)}
                 onToggle={onToggle}
-                onLock={onLock}
               />
             ))}
           </div>
