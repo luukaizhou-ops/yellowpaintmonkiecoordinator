@@ -1,0 +1,34 @@
+# Optional keep-alive: Supabase free-tier projects PAUSE after 7 days with no
+# database activity, which adds a ~30s cold-start the next time someone opens
+# the app. This workflow pings the database every 3 days so it never sleeps.
+#
+# To enable it:
+#   1. In your GitHub repo: Settings -> Secrets and variables -> Actions.
+#   2. Add two "Repository secrets":
+#        SUPABASE_URL       = your Project URL   (same as VITE_SUPABASE_URL)
+#        SUPABASE_ANON_KEY  = your anon key       (same as VITE_SUPABASE_ANON_KEY)
+#   3. That's it — it runs automatically. You can also trigger it manually
+#      from the repo's Actions tab ("Run workflow").
+
+name: Supabase keep-alive
+
+on:
+  schedule:
+    - cron: '0 12 */3 * *' # every 3 days at 12:00 UTC
+  workflow_dispatch: {} # allow manual runs
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping the database
+        run: |
+          echo "Pinging Supabase to keep it awake..."
+          curl --fail --silent --show-error \
+            "${SUPABASE_URL}/rest/v1/availability?select=id&limit=1" \
+            -H "apikey: ${SUPABASE_ANON_KEY}" \
+            -H "Authorization: Bearer ${SUPABASE_ANON_KEY}"
+          echo "\nPing complete."
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
