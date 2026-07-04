@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
 import { NAME_STORAGE_KEY } from './constants'
 import { useSchedule } from './useSchedule'
-import { formatShort } from './dateUtils'
 import NamePicker from './components/NamePicker'
 import HangoutBanner from './components/HangoutBanner'
 import BestDates from './components/BestDates'
 import DateGrid from './components/DateGrid'
+import LockInModal from './components/LockInModal'
 
 export default function App() {
   // Remember who you are on this device.
@@ -26,6 +26,9 @@ export default function App() {
   }, [name])
 
   const schedule = useSchedule(name)
+
+  // Which date/slot the "lock in" modal is open for (null = closed).
+  const [lockTarget, setLockTarget] = useState(null)
 
   // Missing keys? Point the user at the setup instructions instead of a
   // blank, confusing screen.
@@ -63,14 +66,14 @@ export default function App() {
     setName(null)
   }
 
-  const handleLock = (date, slot) => {
-    const suggested = schedule.hangout?.title || 'Pie baking'
-    const title = window.prompt(
-      `Lock in ${formatShort(date)} (${slot}) as the hangout?\n\nWhat's it called?`,
-      suggested
-    )
-    if (title === null) return // cancelled
-    schedule.setChosenHangout(date, slot, title.trim() || 'Pie baking')
+  // Open the modal instead of a native prompt.
+  const handleLock = (date, slot) => setLockTarget({ date, slot })
+
+  const confirmLock = (title) => {
+    if (lockTarget) {
+      schedule.setChosenHangout(lockTarget.date, lockTarget.slot, title)
+    }
+    setLockTarget(null)
   }
 
   return (
@@ -114,6 +117,13 @@ export default function App() {
       <footer className="app-footer">
         <p>Shared across {schedule.totalFriends} friends’ phones · live-synced</p>
       </footer>
+
+      <LockInModal
+        target={lockTarget}
+        defaultTitle={schedule.hangout?.title || 'Pie baking'}
+        onConfirm={confirmLock}
+        onCancel={() => setLockTarget(null)}
+      />
     </div>
   )
 }
